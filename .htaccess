@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www.drwang.ca
+RewriteRule (.*) https://drwang.ca/$1 [R=301,L]
+DirectoryIndex index.html

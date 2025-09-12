@@ -1,0 +1,29 @@
+[23-Sep-2015 17:14:30 America/Toronto] PHP Parse error:  syntax error, unexpected '<' in /home/drwan940/public_html/newsletter-email.php on line 11
+[23-Sep-2015 17:15:41 America/Toronto] PHP Parse error:  syntax error, unexpected 'color' (T_STRING) in /home/drwan940/public_html/newsletter-email.php on line 20
+[23-Sep-2015 17:22:47 America/Toronto] PHP Parse error:  syntax error, unexpected 'color' (T_STRING) in /home/drwan940/public_html/newsletter-email.php on line 20
+[23-Sep-2015 17:24:02 America/Toronto] PHP Parse error:  syntax error, unexpected '';' (T_ENCAPSED_AND_WHITESPACE) in /home/drwan940/public_html/newsletter-email.php on line 11
+[23-Sep-2015 17:28:01 America/Toronto] PHP Parse error:  syntax error, unexpected '"\r\n"' (T_CONSTANT_ENCAPSED_STRING) in /home/drwan940/public_html/newsletter-email.php on line 11
+[24-Sep-2015 00:32:14 America/Toronto] PHP Parse error:  syntax error, unexpected '{' in /home/drwan940/public_html/send_form_email.php on line 43
+[24-Sep-2015 00:33:07 America/Toronto] PHP Parse error:  syntax error, unexpected ';' in /home/drwan940/public_html/send_form_email.php on line 45
+[24-Sep-2015 00:33:53 America/Toronto] PHP Parse error:  syntax error, unexpected '{' in /home/drwan940/public_html/send_form_email.php on line 43
+[25-Sep-2015 00:42:12 America/Toronto] PHP Parse error:  syntax error, unexpected '{' in /home/drwan940/public_html/send_form_email.php on line 43
+[24-Dec-2018 21:08:12 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:08:12 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:08:12 America/Toronto] PHP Warning:  include(): Failed opening 'app/Mage.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in Command line code on line 1
+[24-Dec-2018 21:08:12 America/Toronto] PHP Fatal error:  Class 'Mage' not found in Command line code on line 1
+[24-Dec-2018 21:09:12 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:09:12 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:09:12 America/Toronto] PHP Warning:  include(): Failed opening 'app/Mage.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in Command line code on line 1
+[24-Dec-2018 21:09:12 America/Toronto] PHP Fatal error:  Class 'Mage' not found in Command line code on line 1
+[24-Dec-2018 21:17:25 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:17:25 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:17:25 America/Toronto] PHP Warning:  include(): Failed opening 'app/Mage.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in Command line code on line 1
+[24-Dec-2018 21:17:25 America/Toronto] PHP Fatal error:  Class 'Mage' not found in Command line code on line 1
+[24-Dec-2018 21:18:45 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:18:45 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[24-Dec-2018 21:18:45 America/Toronto] PHP Warning:  include(): Failed opening 'app/Mage.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in Command line code on line 1
+[24-Dec-2018 21:18:45 America/Toronto] PHP Fatal error:  Class 'Mage' not found in Command line code on line 1
+[08-Jan-2019 16:42:20 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[08-Jan-2019 16:42:20 America/Toronto] PHP Warning:  include(app/Mage.php): failed to open stream: No such file or directory in Command line code on line 1
+[08-Jan-2019 16:42:20 America/Toronto] PHP Warning:  include(): Failed opening 'app/Mage.php' for inclusion (include_path='.:/usr/lib/php:/usr/local/lib/php') in Command line code on line 1
+[08-Jan-2019 16:42:20 America/Toronto] PHP Fatal error:  Class 'Mage' not found in Command line code on line 1

@@ -1,0 +1,10 @@
+#force https
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+Header always set Content-Security-Policy "upgrade-insecure-requests;"
+
+RewriteCond %{HTTP_HOST} drwang\.ca [NC]
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://drwang.ca/$1 [R,L]
+
