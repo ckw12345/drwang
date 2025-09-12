@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    scroll-behavior: smooth;
+}
+
+img,
+button,
+iframe,
+a {
+    user-select: none;
+}
+
+.slidein {
+    animation: slideAnimation 1s ease var(--slidein-delay, 0) forwards;
+}
+
+@keyframes slideAnimation {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeIn {
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.fastFadeIn {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fastFadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.myShadow {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+input:user-invalid {
+    border: 1.5px solid rgba(255, 0, 0, 0.416);
+}
+
+.swiper {
+    width: 100%;
+    height: 100%;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slide1 {
+    background: linear-gradient(rgba(255, 0, 0, 0.164), rgba(206, 7, 7, 0.397));
+}
+
+.slide2 {
+    background: linear-gradient(rgba(0, 0, 0, 0.199), rgba(0, 0, 0, 0.493)), url(/Docs/Assets/slide2-1.webp) center/cover no-repeat;
+}
+
+.slide3 {
+    background: linear-gradient(rgba(0, 0, 0, 0.199), rgba(0, 0, 0, 0.493)), url(/Docs/Assets/slide3.jpg) center/cover no-repeat;
+}
+
+.slide4 {
+    background: linear-gradient(rgba(0, 0, 0, 0.199), rgba(0, 0, 0, 0.493)), url(/Docs/Assets/slide4.webp);
+}
+
+.swiper-pagination-bullet-active {
+    background: #3e281b !important;
+}
+
+/* -------------- */
+
+.bgtreatments {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/Treatment_banner.jpg) center/cover no-repeat;
+}
+
+
+.bgPatientTestimonials {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/PatientTestimonials.avif) center/cover no-repeat;
+}
+
+.bgPublications {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/Publication_banner.jpg) center/cover no-repeat;
+}
+
+.bgAbout {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/about2.jpg) center/cover no-repeat;
+}
+
+.bgTreatmentRateSchedule {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/TreatmentRateSchedule.avif) center/cover no-repeat;
+}
+
+.bgfees {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/fees.jpg) center/cover no-repeat;
+}
+
+.bgContact {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/contactUs.jpg) center/cover no-repeat;
+}
+
+.bgCaseReports {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/CaseReports.jpg) center/cover no-repeat;
+}
+
+.textShadow {
+    color: #000;
+    /* Black text */
+    text-shadow:
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 15px #fff,
+        0 0 20px #fff;
+}

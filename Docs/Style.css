@@ -1,0 +1,249 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+* {
+    box-sizing: border-box;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    scroll-behavior: smooth;
+}
+
+img,
+button,
+iframe,
+a {
+    user-select: none;
+}
+
+.slidein {
+    animation: slideAnimation 1s ease var(--slidein-delay, 0) forwards;
+}
+
+@keyframes slideAnimation {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeIn {
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.fastFadeIn {
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fastFadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.myShadow {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+input:user-invalid {
+    border: 1.5px solid rgba(255, 0, 0, 0.416);
+}
+
+.swiper {
+    width: 100%;
+    height: 100%;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slide1 {
+    background: linear-gradient(rgba(255, 0, 0, 0.164), rgba(206, 7, 7, 0.397));
+}
+
+.slide2 {
+    background: linear-gradient(rgba(0, 0, 0, 0.199), rgba(0, 0, 0, 0.493)), url(/Docs/Assets/slide2-1.webp) center/cover no-repeat;
+}
+
+.slide3 {
+    background: linear-gradient(rgba(0, 0, 0, 0.199), rgba(0, 0, 0, 0.493)), url(/Docs/Assets/slide3.jpg) center/cover no-repeat;
+}
+
+.slide4 {
+    background: linear-gradient(rgba(0, 0, 0, 0.199), rgba(0, 0, 0, 0.493)), url(/Docs/Assets/slide4.webp);
+}
+
+.swiper-pagination-bullet-active {
+    background: #3e281b !important;
+}
+
+/* -------------- */
+
+.bgtreatments {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/Treatment_banner.jpg) center/cover no-repeat;
+}
+
+.bgPatientTestimonials {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/testimonial.webp) center/cover no-repeat;
+}
+
+.bgPublications {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/Publication_banner.jpg) center/cover no-repeat;
+}
+
+.bgAbout {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/about2.jpg) center/cover no-repeat;
+}
+
+.bgTreatmentRateSchedule {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/TreatmentRateSchedule.avif) center/cover no-repeat;
+}
+
+.bgfees {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/chinesemoney.jpg) center/cover no-repeat;
+}
+
+.bgContact {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/contactUs.jpg) center/cover no-repeat;
+}
+
+.bgCaseReports {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url("https://drwang.ca/Docs/Assets/about.jpg") center/cover no-repeat;
+}
+
+/* ---- New Backgrounds Added Below ---- */
+
+.bgAcupuncture {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/card2.jpg) center/cover no-repeat;
+}
+
+.bgMedicine {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/card1.jpg) center/cover no-repeat;
+}
+
+.bgFertility {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/tummy.jpg) center/cover no-repeat;
+}
+
+
+.bgmoderntcm {
+    background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), url(/Docs/Assets/aitcm.webp) center/cover no-repeat;
+}
+
+
+.textShadow {
+    color: #000;
+    text-shadow:
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 15px #fff,
+        0 0 20px #fff;
+}
+
+#mobileMenuCloseBtn {
+  position: relative;
+  top: 5rem; /* adjust this value to move the X down */
+}
+#mobileMenuCloseBtn {
+  position: absolute; /* or relative as per your design */
+  top: 16rem;  /* your preferred offset */
+  right: 6rem; /* adjust horizontally */
+  z-index: 9999; /* very high */
+  cursor: pointer;
+  pointer-events: auto;
+}
+#mobileMenu ul {
+  margin-top: 15rem; /* Adjust this value to move the menu items down */
+}
+
+/* General image layer styling */
+.menuImage {
+  position: absolute;
+  pointer-events: none;
+  max-width: none;
+  height: auto;
+}
+
+/* Base Layer 1 */
+.image1 {
+  z-index: 2;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* Tethered Layer 2 */
+.image2 {
+  z-index: 3;
+  width: 100%;      /* Proportional to image1 */
+  top: 14rem;        /* Adjust as needed */
+  left: 0;       /* Adjust as needed */
+}
+
+/* Other layers (unchanged) */
+.image3 {
+  top: 0;
+  right: -170px;
+  width: 1000px;
+  z-index: 9999;
+  transform: rotate(90deg);
+}
+
+.image4 {
+  z-index: 1;
+  width: 100%;
+  top: -50px;
+}
+
+#mobileMenu {
+  background: url("/Docs/Assets/menubackground.jpg") center/cover no-repeat;
+  background-size: cover;  /* Or contain / 100% auto based on needs */
+  background-position: center;
+  background-repeat: no-repeat;
+  backdrop-filter: brightness(1.5);
+}
+
+/* --- ACTIVE MENU ITEM --- */
+#mobileMenu ul li.active > a {
+  color: #59312c !important;
+  font-weight: 700;
+  position: relative;
+  padding-right: 2rem;
+}
+
+#mobileMenu li.active::before {
+  content: '';
+  display: inline-block;
+  width: 16px; /* Adjust size as needed */
+  height: 16px;
+  background-image: url('https://drwang.ca/images/nav-decor-left.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* Hover color for menu links */
+#mobileMenu ul li a:hover {
+  color: #59312c;
+}
