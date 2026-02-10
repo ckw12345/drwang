@@ -115,4 +115,19 @@ People ask is there a way to make the herbal medicine taste better. In the old d
 
 This parent added honey to her child's medicine, and he drank it well, while watching cartoon.
 
-shinku
+            </p>
+        </div>
+       
+    </section>
+
+
+    <div class="md:mt-20 mt-8" id="footer"></div>
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script src="./Docs/javascript/Navbar.js"></script>
+    <script src="./Docs/javascript/Footer.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <script src="./Docs/javascript/global.js"></script>
+
+</body>
+
+</html>
