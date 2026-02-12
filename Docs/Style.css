@@ -247,3 +247,19 @@ input:user-invalid {
 #mobileMenu ul li a:hover {
   color: #59312c;
 }
+
+.poem-banner {
+  position: relative;
+  padding: 3rem 2rem;
+  margin-bottom: 2rem;
+  background: url("/Docs/Assets/mist-bg.jpg") center/cover no-repeat;
+  border-radius: 8px;
+}
+
+.poem-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.6), transparent 70%);
+  pointer-events: none;
+}
