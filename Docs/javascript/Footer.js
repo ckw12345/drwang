@@ -51,7 +51,7 @@ footer.innerHTML = `
                         target="_blank"
                         class="flex items-center space-x-3 hover:opacity-70 transition-all duration-500">
                         <!-- Google Logo -->
-                        <img src="./Docs/Assets/home/Google__G__logo.svg.png" alt="Google logo"
+                        <img src="/Docs/Assets/home/Google__G__logo.svg.png" alt="Google logo"
                             class="w-6 imgAppear h-6">
 
                         <!-- Review Info -->
