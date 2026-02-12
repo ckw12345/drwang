@@ -62,7 +62,7 @@ footer.innerHTML = `
                                     ★★★★★
                                 </div>
                                 <span class="font-semibold text-gray-900">4.8</span>
-                                <span class="text-gray-500 text-xs">(39 reviews)</span>
+                                <span class="text-gray-500 text-xs">(43 reviews)</span>
                             </div>
                             <span class="underline text-blue-600">Read our Google Reviews</span>
                         </div>
