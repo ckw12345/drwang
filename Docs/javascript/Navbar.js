@@ -4,7 +4,7 @@ navbar.innerHTML = `
   <div class="w-full fixed z-50 top-0 left-0">
     <div class="bg-white flex-col w-full md:h-24 h-40 flex items-center justify-center ">
       <div class="flex items-center justify-between max-w-7xl w-full mx-auto md:p-5 p-3">
-        <a href="./index.html" class="w-full max-w-[20rem]">
+        <a href="/index.html" class="w-full max-w-[20rem]">
           <img src="/Docs/Assets/main-logo.png" class="md:h-12 h-8" alt="">
         </a>
         <div data-aos="zoom-out-left" class="flex items-center md:gap-5 gap-1 lg:w-full justify-end">
@@ -46,14 +46,14 @@ navbar.innerHTML = `
       <i id="mobileMenuCloseBtn" class="fa-solid fa-x z-50 relative ml-auto p-5 text-2xl cursor-pointer"></i>
     </div>
     <ul class="flex relative z-50 flex-col p-10 gap-2">
-      <li><a href="./index.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Home</a></li>
-      <li><a href="./treatments.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Treatments</a></li>
-      <li><a href="./testimonials.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Testimonials</a></li>
-      <li><a href="./publications.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Publications</a></li>
-      <li><a href="./case-reports.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Case Reports</a></li>
-      <li><a href="./about.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">About</a></li>
-      <li><a href="./fees.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Fees</a></li>
-      <li><a href="./contact.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Contact</a></li>
+      <li><a href="/index.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Home</a></li>
+      <li><a href="/treatments.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Treatments</a></li>
+      <li><a href="/testimonials.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Testimonials</a></li>
+      <li><a href="/publications.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Publications</a></li>
+      <li><a href="/case-reports.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Case Reports</a></li>
+      <li><a href="/about.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">About</a></li>
+      <li><a href="/fees.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Fees</a></li>
+      <li><a href="/contact.html" class="hover:text-[#59312c] md:text-lg transition-all duration-500">Contact</a></li>
     </ul>
   </div>
   <div class="md:h-24 h-40"></div>
