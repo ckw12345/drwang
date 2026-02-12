@@ -27,7 +27,7 @@ footer.innerHTML = `
             class=" max-w-7xl w-full md:items-start items-center mx-auto grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-10">
 
             <div class="">
-                <img src="./Docs/Assets/home/map.jpg" data-aos="fade" class="w-full " alt="">
+                <img src="/Docs/Assets/home/map.jpg" data-aos="fade" class="w-full " alt="">
             </div>
 
             <div class="flex flex-col items-center justify-center gap-2 ">
