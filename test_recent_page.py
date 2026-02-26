@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 # SETTINGS
 # =====================================
 
-INPUT_FILE = "casereports/recent.html"
+INPUT_FILE = "casereports/recent4.html"
 OUTPUT_FOLDER = "casereports"
 META_DESC_LIMIT = 155
 
