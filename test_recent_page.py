@@ -1,104 +1,112 @@
-import os
 import re
 from transformers import pipeline
 
-# ===============================
+# =====================================
 # CONFIG
-# ===============================
+# =====================================
 
-MAX_INPUT_CHARS = 3000     # safe size per chunk (~900 tokens)
-SUMMARY_MAX_LEN = 120
-SUMMARY_MIN_LEN = 40
+MODEL_NAME = "google/flan-t5-large"
 
-# ===============================
-# LOAD SUMMARIZER
-# ===============================
+MAX_CHARS_PER_CHUNK = 2200
+FINAL_MAX_LEN = 80
+FINAL_MIN_LEN = 35
 
-print("Loading AI summarizer (first run downloads model)...")
+print("Loading FLAN-T5 model (first run downloads model)...")
 
-summarizer = pipeline(
-    "summarization",
-    model="facebook/bart-large-cnn",
-    device=-1   # CPU (GitHub runner safe)
+generator = pipeline(
+    "text2text-generation",
+    model=MODEL_NAME,
+    device=-1   # CPU (GitHub Actions safe)
 )
 
-# ===============================
-# HELPERS
-# ===============================
+# =====================================
+# HTML CLEANING
+# =====================================
 
 def clean_html_text(html):
-    """Remove tags and compress whitespace"""
     text = re.sub(r"<script.*?>.*?</script>", "", html, flags=re.DOTALL)
     text = re.sub(r"<style.*?>.*?</style>", "", text, flags=re.DOTALL)
     text = re.sub(r"<.*?>", " ", text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
 
+# =====================================
+# CHUNKING
+# =====================================
 
-def chunk_text(text, max_chars=MAX_INPUT_CHARS):
-    """Split long text into safe chunks"""
-    chunks = []
-    start = 0
+def chunk_text(text, size=MAX_CHARS_PER_CHUNK):
+    return [text[i:i+size] for i in range(0, len(text), size)]
 
-    while start < len(text):
-        chunks.append(text[start:start + max_chars])
-        start += max_chars
+# =====================================
+# STEP 1 — SUMMARIZE EACH CHUNK
+# =====================================
 
-    return chunks
-
-
-def generate_ai_summary(text):
-    """Chunk-safe summarization"""
-
-    print("Generating AI summary...")
+def summarize_chunks(text):
 
     chunks = chunk_text(text)
-
     summaries = []
 
     for i, chunk in enumerate(chunks):
-        print(f"Summarizing chunk {i+1}/{len(chunks)}")
+        print(f"Summarizing section {i+1}/{len(chunks)}")
 
-        try:
-            result = summarizer(
-                chunk,
-                max_length=SUMMARY_MAX_LEN,
-                min_length=SUMMARY_MIN_LEN,
-                do_sample=False,
-                truncation=True
-            )
+        prompt = f"""
+Summarize the following medical case report section in 2 concise sentences.
+Focus on conditions treated, symptoms, and treatment outcomes.
 
-            summaries.append(result[0]["summary_text"])
+TEXT:
+{chunk}
+"""
 
-        except Exception as e:
-            print("Chunk failed:", e)
+        result = generator(
+            prompt,
+            max_length=120,
+            do_sample=False
+        )
 
-    # Combine summaries
-    combined = " ".join(summaries)
+        summaries.append(result[0]["generated_text"])
 
-    # Final compression pass if multiple chunks
-    if len(summaries) > 1:
-        print("Compressing combined summary...")
-        combined = summarizer(
-            combined,
-            max_length=SUMMARY_MAX_LEN,
-            min_length=SUMMARY_MIN_LEN,
-            do_sample=False,
-            truncation=True
-        )[0]["summary_text"]
+    return summaries
 
-    return combined
+# =====================================
+# STEP 2 — BUILD FINAL META DESCRIPTION
+# =====================================
 
+def generate_meta_description(section_summaries, title):
 
-# ===============================
+    combined = " ".join(section_summaries)
+
+    prompt = f"""
+Write an SEO meta description (150–160 characters).
+
+Requirements:
+- Summarize ALL content
+- Mention acupuncture or Traditional Chinese Medicine
+- Clear, professional medical tone
+- One sentence only
+
+PAGE TITLE: {title}
+
+CONTENT SUMMARY:
+{combined}
+"""
+
+    result = generator(
+        prompt,
+        max_length=FINAL_MAX_LEN,
+        min_length=FINAL_MIN_LEN,
+        do_sample=False
+    )
+
+    return result[0]["generated_text"].strip()
+
+# =====================================
 # MAIN
-# ===============================
+# =====================================
 
 def main():
 
     filepath = "casereports/recent4.html"
-
-    print(f"Opening: {filepath}")
+    print("Opening:", filepath)
 
     with open(filepath, "r", encoding="utf-8") as f:
         html = f.read()
@@ -111,18 +119,23 @@ def main():
 
     content_text = clean_html_text(html)
 
-    meta_description = generate_ai_summary(content_text)
+    # Step 1
+    section_summaries = summarize_chunks(content_text)
 
-    print("\n=== GENERATED META DESCRIPTION ===")
+    print("\nSection summaries:")
+    for s in section_summaries:
+        print("-", s)
+
+    # Step 2
+    meta_description = generate_meta_description(section_summaries, title)
+
+    print("\nFINAL META DESCRIPTION:")
     print(meta_description)
 
-    # Save output
-    output_file = "generated_summary.txt"
-
-    with open(output_file, "w", encoding="utf-8") as f:
+    with open("generated_summary.txt", "w", encoding="utf-8") as f:
         f.write(meta_description)
 
-    print(f"\nSaved → {output_file}")
+    print("Saved generated_summary.txt")
 
 
 if __name__ == "__main__":
