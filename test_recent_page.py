@@ -1,141 +1,126 @@
+from bs4 import BeautifulSoup
 import re
-from transformers import pipeline
+from pathlib import Path
 
-# =====================================
-# CONFIG
-# =====================================
+INPUT_FILE = "casereports/recent4.html"
+OUTPUT_FILE = "casereports/recent4_test.html"
 
-MODEL_NAME = "google/flan-t5-large"
 
-MAX_CHARS_PER_CHUNK = 2200
-FINAL_MAX_LEN = 80
-FINAL_MIN_LEN = 35
+# --------------------------------------------------
+# Medical relevance keywords
+# (customize freely)
+# --------------------------------------------------
+MEDICAL_KEYWORDS = [
+    "pain", "acupuncture", "treatment", "symptom", "diagnosis",
+    "syndrome", "insomnia", "anxiety", "depression",
+    "knee", "back", "neck", "shoulder", "sinus",
+    "digestive", "fatigue", "headache", "migraine",
+    "tcM", "herbal", "therapy", "condition"
+]
 
-print("Loading FLAN-T5 model (first run downloads model)...")
 
-generator = pipeline(
-    "text2text-generation",
-    model=MODEL_NAME,
-    device=-1   # CPU (GitHub Actions safe)
-)
+# --------------------------------------------------
+# Split sentences
+# --------------------------------------------------
+def split_sentences(text):
+    text = re.sub(r'\s+', ' ', text).strip()
+    return re.split(r'(?<=[.!?])\s+', text)
 
-# =====================================
-# HTML CLEANING
-# =====================================
 
-def clean_html_text(html):
-    text = re.sub(r"<script.*?>.*?</script>", "", html, flags=re.DOTALL)
-    text = re.sub(r"<style.*?>.*?</style>", "", text, flags=re.DOTALL)
-    text = re.sub(r"<.*?>", " ", text)
-    text = re.sub(r"\s+", " ", text)
-    return text.strip()
+# --------------------------------------------------
+# Check if sentence is medically meaningful
+# --------------------------------------------------
+def is_medical_sentence(sentence):
+    s = sentence.lower()
+    return any(keyword.lower() in s for keyword in MEDICAL_KEYWORDS)
 
-# =====================================
-# CHUNKING
-# =====================================
 
-def chunk_text(text, size=MAX_CHARS_PER_CHUNK):
-    return [text[i:i+size] for i in range(0, len(text), size)]
+# --------------------------------------------------
+# Smart meta description builder
+# --------------------------------------------------
+def build_meta_description(text, max_sentences=3):
 
-# =====================================
-# STEP 1 — SUMMARIZE EACH CHUNK
-# =====================================
+    sentences = split_sentences(text)
 
-def summarize_chunks(text):
+    # Find first meaningful sentence
+    start_index = 0
+    for i, s in enumerate(sentences):
+        if is_medical_sentence(s):
+            start_index = i
+            break
 
-    chunks = chunk_text(text)
-    summaries = []
+    selected = sentences[start_index:start_index + max_sentences]
 
-    for i, chunk in enumerate(chunks):
-        print(f"Summarizing section {i+1}/{len(chunks)}")
+    description = " ".join(selected).strip()
 
-        prompt = f"""
-Summarize the following medical case report section in 2 concise sentences.
-Focus on conditions treated, symptoms, and treatment outcomes.
+    # safety length cap (~320 chars)
+    return description[:320]
 
-TEXT:
-{chunk}
-"""
 
-        result = generator(
-            prompt,
-            max_length=120,
-            do_sample=False
+# --------------------------------------------------
+# Extract main content
+# --------------------------------------------------
+def extract_content_text(soup):
+
+    selectors = [
+        "article",
+        ".content",
+        "#content",
+        ".post",
+        ".entry-content",
+        "main"
+    ]
+
+    for sel in selectors:
+        block = soup.select_one(sel)
+        if block:
+            return block.get_text(" ", strip=True)
+
+    return soup.body.get_text(" ", strip=True)
+
+
+# --------------------------------------------------
+# Update meta tag
+# --------------------------------------------------
+def update_meta_description(soup, description):
+
+    meta = soup.find("meta", attrs={"name": "description"})
+
+    if meta:
+        meta["content"] = description
+    else:
+        new_meta = soup.new_tag(
+            "meta",
+            attrs={"name": "description", "content": description}
         )
+        soup.head.append(new_meta)
 
-        summaries.append(result[0]["generated_text"])
 
-    return summaries
-
-# =====================================
-# STEP 2 — BUILD FINAL META DESCRIPTION
-# =====================================
-
-def generate_meta_description(section_summaries, title):
-
-    combined = " ".join(section_summaries)
-
-    prompt = f"""
-Write an SEO meta description (150–160 characters).
-
-Requirements:
-- Summarize ALL content
-- Mention acupuncture or Traditional Chinese Medicine
-- Clear, professional medical tone
-- One sentence only
-
-PAGE TITLE: {title}
-
-CONTENT SUMMARY:
-{combined}
-"""
-
-    result = generator(
-        prompt,
-        max_length=FINAL_MAX_LEN,
-        min_length=FINAL_MIN_LEN,
-        do_sample=False
-    )
-
-    return result[0]["generated_text"].strip()
-
-# =====================================
+# --------------------------------------------------
 # MAIN
-# =====================================
-
+# --------------------------------------------------
 def main():
 
-    filepath = "casereports/recent4.html"
-    print("Opening:", filepath)
+    input_path = Path(INPUT_FILE)
+    output_path = Path(OUTPUT_FILE)
 
-    with open(filepath, "r", encoding="utf-8") as f:
-        html = f.read()
+    print(f"Opening: {input_path}")
 
-    # Extract title
-    title_match = re.search(r"<title>(.*?)</title>", html, re.I)
-    title = title_match.group(1) if title_match else "Untitled"
+    html = input_path.read_text(encoding="utf-8")
+    soup = BeautifulSoup(html, "lxml")
 
-    print("Detected title:", title)
+    content_text = extract_content_text(soup)
 
-    content_text = clean_html_text(html)
+    meta_description = build_meta_description(content_text)
 
-    # Step 1
-    section_summaries = summarize_chunks(content_text)
-
-    print("\nSection summaries:")
-    for s in section_summaries:
-        print("-", s)
-
-    # Step 2
-    meta_description = generate_meta_description(section_summaries, title)
-
-    print("\nFINAL META DESCRIPTION:")
+    print("Generated meta description:")
     print(meta_description)
 
-    with open("generated_summary.txt", "w", encoding="utf-8") as f:
-        f.write(meta_description)
+    update_meta_description(soup, meta_description)
 
-    print("Saved generated_summary.txt")
+    output_path.write_text(str(soup), encoding="utf-8")
+
+    print(f"Updated page written to: {output_path}")
 
 
 if __name__ == "__main__":
