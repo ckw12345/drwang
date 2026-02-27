@@ -2,3 +2,4 @@ beautifulsoup4==4.14.3
 torch==2.2.0
 transformers==4.44.0
 sentencepiece==0.1.99
+numpy<2
