@@ -1,24 +1,10 @@
 from bs4 import BeautifulSoup
 import re
 from pathlib import Path
+from collections import Counter
 
 INPUT_FILE = "casereports/recent4.html"
 OUTPUT_FILE = "casereports/recent4_test.html"
-
-# --------------------------------------------------
-# Extract keywords from TITLE
-# --------------------------------------------------
-def extract_title_keywords(title):
-    main_title = title.split("|")[0]
-    clean = re.sub(r"[^\w\s]", " ", main_title)
-    words = clean.lower().split()
-
-    STOPWORDS = {
-        "for","and","the","in","of","a","an",
-        "with","case","report","tcm"
-    }
-
-    return [w for w in words if w not in STOPWORDS and len(w) > 2]
 
 # --------------------------------------------------
 # Sentence splitting
@@ -89,6 +75,22 @@ def build_meta_description(text, keywords):
     return " ".join(best_window)[:320]  # trim to 320 chars
 
 # --------------------------------------------------
+# Generate meta keywords from content
+# --------------------------------------------------
+STOPWORDS = {
+    "for","and","the","in","of","a","an","with",
+    "case","report","tcm","patient","was","is","on",
+    "at","by","to","from","after","before"
+}
+
+def generate_meta_keywords(text, top_n=15):
+    clean_text = re.sub(r"[^\w\s]", " ", text.lower())
+    words = [w for w in clean_text.split() if w not in STOPWORDS and len(w) > 2]
+    freq = Counter(words)
+    keywords = [word for word, count in freq.most_common(top_n)]
+    return keywords
+
+# --------------------------------------------------
 # Update meta tag
 # --------------------------------------------------
 def update_meta_description(soup, description):
@@ -99,6 +101,18 @@ def update_meta_description(soup, description):
         new_meta = soup.new_tag(
             "meta",
             attrs={"name": "description", "content": description}
+        )
+        soup.head.append(new_meta)
+
+def update_meta_keywords(soup, keywords):
+    content = ", ".join(keywords)
+    meta = soup.find("meta", attrs={"name": "keywords"})
+    if meta:
+        meta["content"] = content
+    else:
+        new_meta = soup.new_tag(
+            "meta",
+            attrs={"name":"keywords","content":content}
         )
         soup.head.append(new_meta)
 
@@ -119,20 +133,24 @@ def main():
     title = soup.title.string.strip()
     print("Detected title:", title)
 
-    keywords = extract_title_keywords(title)
-    print("Keywords:", keywords)
-
+    # Extract main content
     content_text = extract_main_content(soup)
 
-    meta_description = build_meta_description(content_text, keywords)
-    print("\nGenerated description:\n", meta_description)
+    # Generate meta keywords from content
+    meta_keywords = generate_meta_keywords(content_text, top_n=15)
+    print("Meta keywords:", meta_keywords)
 
+    # Generate meta description (best 3-sentence window)
+    meta_description = build_meta_description(content_text, meta_keywords)
+    print("\nGenerated meta description:\n", meta_description)
+
+    # Update tags in soup
     update_meta_description(soup, meta_description)
+    update_meta_keywords(soup, meta_keywords)
 
+    # Save output
     output_path.write_text(str(soup), encoding="utf-8")
-
     print("\n✅ Updated page saved:", output_path)
-
 
 if __name__ == "__main__":
     main()
