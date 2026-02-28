@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import re
 from pathlib import Path
-from collections import Counter
 
 INPUT_FILE = "casereports/recent4.html"
 OUTPUT_FILE = "casereports/recent4_test.html"
@@ -20,9 +19,10 @@ def extract_main_content(soup):
     best_block = None
     best_length = 0
 
+    # look for main content block heuristically
     for tag in soup.find_all(["div", "article", "section", "main"]):
         paragraphs = tag.find_all("p")
-        if len(paragraphs) < 2:
+        if len(paragraphs) < 1:
             continue
         text = " ".join(p.get_text(" ", strip=True) for p in paragraphs)
         length = len(text)
@@ -33,6 +33,7 @@ def extract_main_content(soup):
     if not best_block:
         raise Exception("Could not locate main content block")
 
+    # join paragraphs with significant length (>60 chars)
     paragraphs = best_block.find_all("p")
     texts = []
     for p in paragraphs:
@@ -42,9 +43,9 @@ def extract_main_content(soup):
     return " ".join(texts)
 
 # ----------------------------
-# Build meta description using 3-sentence sliding window scored by keywords
+# Build meta description using 3-sentence window scored by title keywords
 # ----------------------------
-def build_meta_description(text, keywords):
+def build_meta_description(text, title_keywords):
     sentences = split_sentences(text)
     if len(sentences) <= 3:
         return " ".join(sentences)
@@ -52,22 +53,26 @@ def build_meta_description(text, keywords):
     windows = [sentences[i:i+3] for i in range(len(sentences)-2)]
     scores = []
     for w in windows:
-        combined = " ".join(w).lower()
-        score = sum(combined.count(k.lower()) for k in keywords)
+        first_sentence = w[0].lower()
+        score = sum(first_sentence.count(k.lower()) for k in title_keywords)
         scores.append(score)
 
     max_idx = scores.index(max(scores))
     best_window = windows[max_idx]
-    return " ".join(best_window)[:320]
+    return " ".join(best_window)[:320]  # optional cut-off at 320 chars
 
 # ----------------------------
-# Extract keywords from title first segment + hard-coded phrase
+# Extract keywords from title first segment
 # ----------------------------
 def extract_title_keywords(title):
     first_segment = title.split("|")[0].strip()  # before vertical divider
-    words = re.findall(r"\b\w+\b", first_segment)
-    keywords = words + ["acupuncture surrey"]
-    return keywords
+    # split by comma to get individual keywords
+    raw_keywords = [kw.strip() for kw in first_segment.split(",") if kw.strip()]
+    keywords_list = []
+    for kw in raw_keywords:
+        keywords_list.append(f"Acupuncture for {kw}")
+        keywords_list.append(f"TCM for {kw}")
+    return keywords_list, raw_keywords  # return both for scoring
 
 # ----------------------------
 # Update meta tags
@@ -105,12 +110,12 @@ def main():
     # Extract main content
     content_text = extract_main_content(soup)
 
-    # Generate keywords from title first segment + hard-coded phrase
-    meta_keywords = extract_title_keywords(title)
+    # Generate meta keywords (title first segment + Acupuncture/TCM prefixes)
+    meta_keywords, title_keywords_for_scoring = extract_title_keywords(title)
     print("Meta keywords:", meta_keywords)
 
-    # Generate meta description (best 3-sentence window scored by keywords)
-    meta_description = build_meta_description(content_text, meta_keywords)
+    # Generate meta description (best 3-sentence window scored by title keywords)
+    meta_description = build_meta_description(content_text, title_keywords_for_scoring)
     print("\nGenerated meta description:\n", meta_description)
 
     # Update soup tags
