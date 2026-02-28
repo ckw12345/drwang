@@ -7,20 +7,25 @@ OUTPUT_FILE = "casereports/recent4_test.html"
 
 
 # --------------------------------------------------
-# Medical relevance keywords
-# (customize freely)
+# Extract keywords from TITLE
 # --------------------------------------------------
-MEDICAL_KEYWORDS = [
-    "pain", "acupuncture", "treatment", "symptom", "diagnosis",
-    "syndrome", "insomnia", "anxiety", "depression",
-    "knee", "back", "neck", "shoulder", "sinus",
-    "digestive", "fatigue", "headache", "migraine",
-    "tcM", "herbal", "therapy", "condition"
-]
+def extract_title_keywords(title):
+
+    main_title = title.split("|")[0]
+
+    clean = re.sub(r"[^\w\s]", " ", main_title)
+    words = clean.lower().split()
+
+    STOPWORDS = {
+        "for","and","the","in","of","a","an",
+        "with","case","report","tcm"
+    }
+
+    return [w for w in words if w not in STOPWORDS and len(w) > 2]
 
 
 # --------------------------------------------------
-# Split sentences
+# Sentence splitting
 # --------------------------------------------------
 def split_sentences(text):
     text = re.sub(r'\s+', ' ', text).strip()
@@ -28,55 +33,72 @@ def split_sentences(text):
 
 
 # --------------------------------------------------
-# Check if sentence is medically meaningful
+# SMART CONTENT DETECTION ⭐⭐⭐
 # --------------------------------------------------
-def is_medical_sentence(sentence):
+def extract_main_content(soup):
+    """
+    Find container with MOST paragraph text.
+    This reliably finds article body.
+    """
+
+    best_block = None
+    best_length = 0
+
+    for tag in soup.find_all(["div", "article", "section", "main"]):
+        paragraphs = tag.find_all("p")
+
+        if len(paragraphs) < 2:
+            continue
+
+        text = " ".join(p.get_text(" ", strip=True) for p in paragraphs)
+        length = len(text)
+
+        if length > best_length:
+            best_length = length
+            best_block = tag
+
+    if not best_block:
+        raise Exception("Could not locate main content block")
+
+    print("Detected content container:", best_block.name)
+
+    paragraphs = best_block.find_all("p")
+
+    texts = []
+    for p in paragraphs:
+        t = p.get_text(" ", strip=True)
+
+        # ignore ultra short lines (menus etc)
+        if len(t) > 60:
+            texts.append(t)
+
+    return " ".join(texts)
+
+
+# --------------------------------------------------
+# Sentence relevance
+# --------------------------------------------------
+def is_relevant(sentence, keywords):
     s = sentence.lower()
-    return any(keyword.lower() in s for keyword in MEDICAL_KEYWORDS)
+    return any(k in s for k in keywords)
 
 
 # --------------------------------------------------
-# Smart meta description builder
+# Build meta description (3 sentences)
 # --------------------------------------------------
-def build_meta_description(text, max_sentences=3):
+def build_meta_description(text, keywords):
 
     sentences = split_sentences(text)
 
-    # Find first meaningful sentence
-    start_index = 0
+    start = 0
     for i, s in enumerate(sentences):
-        if is_medical_sentence(s):
-            start_index = i
+        if is_relevant(s, keywords):
+            start = i
             break
 
-    selected = sentences[start_index:start_index + max_sentences]
+    selected = sentences[start:start+3]
 
-    description = " ".join(selected).strip()
-
-    # safety length cap (~320 chars)
-    return description[:320]
-
-
-# --------------------------------------------------
-# Extract main content
-# --------------------------------------------------
-def extract_content_text(soup):
-
-    selectors = [
-        "article",
-        ".content",
-        "#content",
-        ".post",
-        ".entry-content",
-        "main"
-    ]
-
-    for sel in selectors:
-        block = soup.select_one(sel)
-        if block:
-            return block.get_text(" ", strip=True)
-
-    return soup.body.get_text(" ", strip=True)
+    return " ".join(selected)[:320]
 
 
 # --------------------------------------------------
@@ -106,21 +128,28 @@ def main():
 
     print(f"Opening: {input_path}")
 
-    html = input_path.read_text(encoding="utf-8")
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(
+        input_path.read_text(encoding="utf-8"),
+        "lxml"
+    )
 
-    content_text = extract_content_text(soup)
+    title = soup.title.string.strip()
+    print("Detected title:", title)
 
-    meta_description = build_meta_description(content_text)
+    keywords = extract_title_keywords(title)
+    print("Keywords:", keywords)
 
-    print("Generated meta description:")
-    print(meta_description)
+    content_text = extract_main_content(soup)
+
+    meta_description = build_meta_description(content_text, keywords)
+
+    print("\nGenerated description:\n", meta_description)
 
     update_meta_description(soup, meta_description)
 
     output_path.write_text(str(soup), encoding="utf-8")
 
-    print(f"Updated page written to: {output_path}")
+    print("\n✅ Updated page saved:", output_path)
 
 
 if __name__ == "__main__":
