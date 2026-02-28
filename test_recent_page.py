@@ -5,14 +5,11 @@ from pathlib import Path
 INPUT_FILE = "casereports/recent4.html"
 OUTPUT_FILE = "casereports/recent4_test.html"
 
-
 # --------------------------------------------------
 # Extract keywords from TITLE
 # --------------------------------------------------
 def extract_title_keywords(title):
-
     main_title = title.split("|")[0]
-
     clean = re.sub(r"[^\w\s]", " ", main_title)
     words = clean.lower().split()
 
@@ -23,7 +20,6 @@ def extract_title_keywords(title):
 
     return [w for w in words if w not in STOPWORDS and len(w) > 2]
 
-
 # --------------------------------------------------
 # Sentence splitting
 # --------------------------------------------------
@@ -31,16 +27,14 @@ def split_sentences(text):
     text = re.sub(r'\s+', ' ', text).strip()
     return re.split(r'(?<=[.!?])\s+', text)
 
-
 # --------------------------------------------------
-# SMART CONTENT DETECTION ⭐⭐⭐
+# SMART CONTENT DETECTION
 # --------------------------------------------------
 def extract_main_content(soup):
     """
     Find container with MOST paragraph text.
     This reliably finds article body.
     """
-
     best_block = None
     best_length = 0
 
@@ -60,54 +54,45 @@ def extract_main_content(soup):
     if not best_block:
         raise Exception("Could not locate main content block")
 
-    print("Detected content container:", best_block.name)
-
     paragraphs = best_block.find_all("p")
 
     texts = []
     for p in paragraphs:
         t = p.get_text(" ", strip=True)
-
-        # ignore ultra short lines (menus etc)
-        if len(t) > 60:
+        if len(t) > 60:  # skip very short lines
             texts.append(t)
 
     return " ".join(texts)
 
-
 # --------------------------------------------------
-# Sentence relevance
-# --------------------------------------------------
-def is_relevant(sentence, keywords):
-    s = sentence.lower()
-    return any(k in s for k in keywords)
-
-
-# --------------------------------------------------
-# Build meta description (3 sentences)
+# Build meta description using keyword scoring
 # --------------------------------------------------
 def build_meta_description(text, keywords):
-
     sentences = split_sentences(text)
 
-    start = 0
-    for i, s in enumerate(sentences):
-        if is_relevant(s, keywords):
-            start = i
-            break
+    if len(sentences) <= 3:
+        return " ".join(sentences)
 
-    selected = sentences[start:start+3]
+    # Build all 3-sentence sliding windows
+    windows = [sentences[i:i+3] for i in range(len(sentences)-2)]
+    scores = []
 
-    return " ".join(selected)[:320]
+    for w in windows:
+        combined = " ".join(w).lower()
+        score = sum(combined.count(k) for k in keywords)
+        scores.append(score)
 
+    # Pick window with highest score
+    max_idx = scores.index(max(scores))
+    best_window = windows[max_idx]
+
+    return " ".join(best_window)[:320]  # trim to 320 chars
 
 # --------------------------------------------------
 # Update meta tag
 # --------------------------------------------------
 def update_meta_description(soup, description):
-
     meta = soup.find("meta", attrs={"name": "description"})
-
     if meta:
         meta["content"] = description
     else:
@@ -117,12 +102,10 @@ def update_meta_description(soup, description):
         )
         soup.head.append(new_meta)
 
-
 # --------------------------------------------------
 # MAIN
 # --------------------------------------------------
 def main():
-
     input_path = Path(INPUT_FILE)
     output_path = Path(OUTPUT_FILE)
 
@@ -142,7 +125,6 @@ def main():
     content_text = extract_main_content(soup)
 
     meta_description = build_meta_description(content_text, keywords)
-
     print("\nGenerated description:\n", meta_description)
 
     update_meta_description(soup, meta_description)
