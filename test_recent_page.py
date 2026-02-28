@@ -68,11 +68,23 @@ def extract_title_keywords(title):
     first_segment = title.split("|")[0].strip()  # before vertical divider
     # split by comma to get individual keywords
     raw_keywords = [kw.strip() for kw in first_segment.split(",") if kw.strip()]
-    keywords_list = []
+
+    cleaned_keywords = []
     for kw in raw_keywords:
+        # remove redundant phrases
+        kw = re.sub(r"(?i)acupuncture for\s*", "", kw)
+        kw = re.sub(r"(?i)in tcm\s*$", "", kw)
+        kw = kw.strip()
+        if kw:
+            cleaned_keywords.append(kw)
+
+    # build meta keywords list with prefixes
+    keywords_list = ["acupuncture surrey"]  # hard-coded keyword phrase
+    for kw in cleaned_keywords:
         keywords_list.append(f"Acupuncture for {kw}")
         keywords_list.append(f"TCM for {kw}")
-    return keywords_list, raw_keywords  # return both for scoring
+
+    return keywords_list, cleaned_keywords  # second list used for scoring
 
 # ----------------------------
 # Update meta tags
