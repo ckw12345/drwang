@@ -83,6 +83,7 @@ def extract_title_keywords(title):
     for kw in cleaned_keywords:
         keywords_list.append(f"Acupuncture for {kw}")
         keywords_list.append(f"TCM for {kw}")
+        keywords_list.append(f"Chinese Medicine for {kw}")
 
     return keywords_list, cleaned_keywords  # second list used for scoring
 
@@ -122,7 +123,7 @@ def main():
     # Extract main content
     content_text = extract_main_content(soup)
 
-    # Generate meta keywords (title first segment + Acupuncture/TCM prefixes)
+    # Generate meta keywords (title first segment + Acupuncture/TCM/Chinese prefixes)
     meta_keywords, title_keywords_for_scoring = extract_title_keywords(title)
     print("Meta keywords:", meta_keywords)
 
