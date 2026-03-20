@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import re
 from pathlib import Path
 
-INPUT_FOLDER = "casereports"
+INPUT_FOLDER = Path("casereports")
 
 # ----------------------------
 # Sentence splitting
@@ -28,6 +28,7 @@ def slugify(text):
 def extract_main_content(soup):
     best_block = None
     best_length = 0
+
     for tag in soup.find_all(["div", "article", "section", "main"]):
         paragraphs = tag.find_all("p")
         if len(paragraphs) < 1:
@@ -36,17 +37,20 @@ def extract_main_content(soup):
         if len(text) > best_length:
             best_length = len(text)
             best_block = tag
+
     if not best_block:
         raise Exception("Could not locate main content block")
+
     texts = []
     for p in best_block.find_all("p"):
         t = p.get_text(" ", strip=True)
         if len(t) > 60:
             texts.append(t)
+
     return " ".join(texts)
 
 # ----------------------------
-# Build meta description
+# Build meta description (3-sentence window)
 # ----------------------------
 def build_meta_description(text, title_keywords):
     sentences = split_sentences(text)
@@ -74,11 +78,13 @@ def extract_title_keywords(title):
         kw = kw.strip()
         if kw:
             cleaned_keywords.append(kw)
+
     keywords_list = ["acupuncture surrey"]
     for kw in cleaned_keywords:
         keywords_list.append(f"Acupuncture for {kw}")
         keywords_list.append(f"TCM for {kw}")
         keywords_list.append(f"Chinese Medicine for {kw}")
+
     return keywords_list, cleaned_keywords, first_segment
 
 # ----------------------------
@@ -89,10 +95,7 @@ def update_meta_description(soup, description):
     if meta:
         meta["content"] = description
     else:
-        new_meta = soup.new_tag(
-            "meta",
-            attrs={"name": "description", "content": description}
-        )
+        new_meta = soup.new_tag("meta", attrs={"name": "description", "content": description})
         soup.head.append(new_meta)
 
 # ----------------------------
@@ -104,90 +107,61 @@ def update_meta_keywords(soup, keywords):
     if meta:
         meta["content"] = content
     else:
-        new_meta = soup.new_tag(
-            "meta",
-            attrs={"name": "keywords", "content": content}
-        )
+        new_meta = soup.new_tag("meta", attrs={"name": "keywords", "content": content})
         soup.head.append(new_meta)
 
 # ----------------------------
-# Create 301 redirect file
+# Add 301 redirect for original file
 # ----------------------------
-def create_redirect(original_file, new_file):
-    redirect_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url={new_file}">
-<link rel="canonical" href="{new_file}">
-<title>Page Moved</title>
-</head>
-<body>
-<p>This page has moved to <a href="{new_file}">{new_file}</a>.</p>
-</body>
-</html>
-"""
-    Path(original_file).write_text(redirect_content, encoding="utf-8")
-    print(f"✅ 301 redirect created: {original_file} -> {new_file}")
+def add_301_redirect(soup, original_filename):
+    redirect_tag = soup.new_tag("meta", attrs={
+        "http-equiv": "refresh",
+        "content": f"0; url={original_filename}"
+    })
+    soup.head.insert(0, redirect_tag)
 
 # ----------------------------
-# PROCESS SINGLE FILE
+# Process a single file
 # ----------------------------
-def process_file(input_path):
-    print("\n============================")
+def process_file(input_path: Path):
     print("Opening:", input_path)
-
-    raw_html = input_path.read_text(encoding="utf-8")
-
-    # Skip already processed files
-    if "Generated from original file:" in raw_html:
-        print("⏭ Skipped (already processed)")
-        return
-
-    soup = BeautifulSoup(raw_html, "lxml")
-
-    if not soup.title or not soup.title.string:
-        print("⚠️ Skipped (no title)")
-        return
+    soup = BeautifulSoup(input_path.read_text(encoding="utf-8"), "lxml")
 
     title = soup.title.string.strip()
     print("Detected title:", title)
 
-    # Extract content
     content_text = extract_main_content(soup)
-
-    # Generate keywords
     meta_keywords, title_keywords_for_scoring, first_segment = extract_title_keywords(title)
 
-    # Generate meta description
     meta_description = build_meta_description(content_text, title_keywords_for_scoring)
 
-    # Update meta tags
     update_meta_description(soup, meta_description)
     update_meta_keywords(soup, meta_keywords)
 
-    # Generate filename
-    filename = slugify(first_segment)
-    output_path = Path(INPUT_FOLDER) / filename
-
+    filename = slugify(first_segment + " in tcm")  # keep "in tcm" in filename
+    output_path = input_path.parent / filename
     print("Output filename:", filename)
 
-    # Save new file
-    comment = f"<!-- Generated from original file: {input_path.name} -->\n"
-    output_path.write_text(comment + str(soup), encoding="utf-8")
-    print("✅ Page saved:", output_path)
+    # Add 301 redirect to point old file to new file
+    add_301_redirect(soup, input_path.name)
 
-    # Create redirect
-    create_redirect(input_path, filename)
+    output_path.write_text(str(soup), encoding="utf-8")
+    print("✅ Page saved with 301 redirect:", output_path)
 
 # ----------------------------
 # MAIN
 # ----------------------------
 def main():
-    folder = Path(INPUT_FOLDER)
+    skip_files = {
+        "recent4.html",
+        "acupuncture-for-knee-leg-pain-rib-pain-sinus-problem-in-tcm.html"
+    }
 
-    for file_path in folder.glob("*.html"):
-        process_file(file_path)
+    for html_file in INPUT_FOLDER.glob("*.html"):
+        if html_file.name in skip_files:
+            print("Skipping:", html_file.name)
+            continue
+        process_file(html_file)
 
 if __name__ == "__main__":
     main()
