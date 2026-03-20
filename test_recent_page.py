@@ -2,7 +2,11 @@ from bs4 import BeautifulSoup
 import re
 from pathlib import Path
 
-INPUT_FOLDER = Path("casereports")
+CASEREPORTS_DIR = Path("casereports")
+SKIP_FILES = [
+    "recent4.html", 
+    "acupuncture-for-knee-leg-pain-rib-pain-sinus-problem-in-tcm.html"
+]
 
 # ----------------------------
 # Sentence splitting
@@ -20,7 +24,9 @@ def slugify(text):
     text = re.sub(r"[^a-z0-9\s-]", "", text)
     text = re.sub(r"\s+", "-", text)
     text = re.sub(r"-+", "-", text)
-    return text.strip("-") + ".html"
+    # remove trailing '-in-tcm' if present
+    text = re.sub(r"-in-tcm$", "", text)
+    return text.strip("-") + "-in-tcm.html"
 
 # ----------------------------
 # Smart content extraction
@@ -50,18 +56,20 @@ def extract_main_content(soup):
     return " ".join(texts)
 
 # ----------------------------
-# Build meta description (3-sentence window)
+# Build meta description
 # ----------------------------
 def build_meta_description(text, title_keywords):
     sentences = split_sentences(text)
     if len(sentences) <= 3:
         return " ".join(sentences)
+
     windows = [sentences[i:i+3] for i in range(len(sentences)-2)]
     scores = []
     for w in windows:
         first_sentence = w[0].lower()
         score = sum(first_sentence.count(k.lower()) for k in title_keywords)
         scores.append(score)
+
     best_window = windows[scores.index(max(scores))]
     return " ".join(best_window)[:320]
 
@@ -111,57 +119,61 @@ def update_meta_keywords(soup, keywords):
         soup.head.append(new_meta)
 
 # ----------------------------
-# Add 301 redirect for original file
+# Add 301 redirect to original file
 # ----------------------------
-def add_301_redirect(soup, original_filename):
-    redirect_tag = soup.new_tag("meta", attrs={
-        "http-equiv": "refresh",
-        "content": f"0; url={original_filename}"
-    })
-    soup.head.insert(0, redirect_tag)
-
-# ----------------------------
-# Process a single file
-# ----------------------------
-def process_file(input_path: Path):
-    print("Opening:", input_path)
-    soup = BeautifulSoup(input_path.read_text(encoding="utf-8"), "lxml")
-
-    title = soup.title.string.strip()
-    print("Detected title:", title)
-
-    content_text = extract_main_content(soup)
-    meta_keywords, title_keywords_for_scoring, first_segment = extract_title_keywords(title)
-
-    meta_description = build_meta_description(content_text, title_keywords_for_scoring)
-
-    update_meta_description(soup, meta_description)
-    update_meta_keywords(soup, meta_keywords)
-
-    filename = slugify(first_segment + " in tcm")  # keep "in tcm" in filename
-    output_path = input_path.parent / filename
-    print("Output filename:", filename)
-
-    # Add 301 redirect to point old file to new file
-    add_301_redirect(soup, input_path.name)
-
-    output_path.write_text(str(soup), encoding="utf-8")
-    print("✅ Page saved with 301 redirect:", output_path)
+def add_301_redirect(original_path, new_filename):
+    soup = BeautifulSoup(original_path.read_text(encoding="utf-8"), "lxml")
+    redirect_tag = soup.new_tag(
+        "meta",
+        attrs={"http-equiv": "refresh", "content": f"0; url={new_filename}"}
+    )
+    # Optional: Add comment about original filename
+    comment = soup.new_string(f"Original file: {original_path.name}", Comment=True)
+    soup.head.insert(0, comment)
+    soup.head.insert(1, redirect_tag)
+    original_path.write_text(str(soup), encoding="utf-8")
 
 # ----------------------------
 # MAIN
 # ----------------------------
 def main():
-    skip_files = {
-        "recent4.html",
-        "acupuncture-for-knee-leg-pain-rib-pain-sinus-problem-in-tcm.html"
-    }
-
-    for html_file in INPUT_FOLDER.glob("*.html"):
-        if html_file.name in skip_files:
+    for html_file in CASEREPORTS_DIR.glob("*.html"):
+        if html_file.name in SKIP_FILES:
             print("Skipping:", html_file.name)
             continue
-        process_file(html_file)
+
+        print("Opening:", html_file)
+        soup = BeautifulSoup(html_file.read_text(encoding="utf-8"), "lxml")
+        title = soup.title.string.strip()
+        print("Detected title:", title)
+
+        # Extract content
+        content_text = extract_main_content(soup)
+
+        # Generate keywords
+        meta_keywords, title_keywords_for_scoring, first_segment = extract_title_keywords(title)
+        print("Meta keywords:", meta_keywords)
+
+        # Generate meta description
+        meta_description = build_meta_description(content_text, title_keywords_for_scoring)
+        print("Generated meta description:", meta_description)
+
+        # Update meta tags
+        update_meta_description(soup, meta_description)
+        update_meta_keywords(soup, meta_keywords)
+
+        # Generate filename from title first segment (including "in tcm")
+        filename = slugify(first_segment)
+        output_path = CASEREPORTS_DIR / filename
+        print("Output filename:", filename)
+
+        # Save new page
+        output_path.write_text(str(soup), encoding="utf-8")
+        print("✅ Page saved with 301 redirect:", output_path)
+
+        # Add 301 redirect to original file
+        add_301_redirect(html_file, filename)
+        print("✅ Original file updated with 301 redirect:", html_file.name)
 
 if __name__ == "__main__":
     main()
