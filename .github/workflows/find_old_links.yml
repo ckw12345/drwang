@@ -1,4 +1,4 @@
-name: Find Old Case Report Links
+name: Find Old CaseReport Links
 
 on:
   workflow_dispatch:
@@ -6,30 +6,25 @@ on:
 jobs:
   find-links:
     runs-on: ubuntu-latest
+
     steps:
-      # Checkout code
       - uses: actions/checkout@v4
 
-      # Setup Python
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      # Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Install deps
+        run: pip install beautifulsoup4 lxml
 
-      # Run Python script
-      - name: Run find_old_links.py
-        run: python find_old_links.py
+      # ✅ FIXED HERE
+      - name: Run script
+        run: python find_old_casereport_links.py
 
-      # Commit log file (optional)
-      - name: Commit log
+      - name: Commit log to repo
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add old_links_log.txt || echo "No log generated"
-          git commit -m "Generated old links log" || echo "No changes to commit"
+          git add old_casereport_links_log.txt
+          git commit -m "Generated links log" || echo "No changes"
           git push
