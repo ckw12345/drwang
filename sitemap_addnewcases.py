@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from xml.etree.ElementTree import Element, SubElement, tostring, ElementTree
+from xml.etree.ElementTree import Element, SubElement, ElementTree
 
 # Configuration
 SITE_URL = "https://drwang.ca"
