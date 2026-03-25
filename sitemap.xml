@@ -1,71 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset 
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- Homepage -->
-  <url>
-    <loc>https://drwang.ca/</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
+    <!-- Homepage -->
+    <url>
+        <loc>https://drwang.ca/</loc>
+        <lastmod>2026-03-25</lastmod>
+        <changefreq>weekly</changefreq>
+    </url>
 
-  <!-- Treatments Section -->
-  <url>
-    <loc>https://drwang.ca/treatments.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://drwang.ca/acupuncture.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://drwang.ca/medicine.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://drwang.ca/patient.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
+    <!-- Treatments Section -->
+    <url>
+        <loc>https://drwang.ca/treatments.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/acupuncture.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/medicine.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/patient.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
 
-  <!-- Other Main Sections -->
-  <url>
-    <loc>https://drwang.ca/case-reports.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
+    <!-- Other Main Sections -->
+    <url>
+        <loc>https://drwang.ca/case-reports.html</loc>
+        <lastmod>2026-03-25</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/fees.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/testimonial.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>yearly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/publications.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>yearly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/about.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
+    <url>
+        <loc>https://drwang.ca/contact.html</loc>
+        <lastmod>2025-07-30</lastmod>
+        <changefreq>monthly</changefreq>
+    </url>
 
-  <url>
-    <loc>https://drwang.ca/fees.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-
-  <url>
-    <loc>https://drwang.ca/testimonial.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>yearly</changefreq>
-  </url>
-
-  <url>
-    <loc>https://drwang.ca/publications.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>yearly</changefreq>
-  </url>
-
-  <url>
-    <loc>https://drwang.ca/about.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
-
-  <url>
-    <loc>https://drwang.ca/contact.html</loc>
-    <lastmod>2025-07-30</lastmod>
-    <changefreq>monthly</changefreq>
-  </url>
+    <!-- Case Reports Folder (scan all HTML files inside) -->
+    <url>
+        <loc>https://drwang.ca/casereports/</loc>
+        <lastmod>2026-03-25</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
 
 </urlset>
