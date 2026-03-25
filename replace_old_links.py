@@ -5,68 +5,80 @@ import re
 # ----------------------------
 # Configuration
 # ----------------------------
-
-# Pages that contain links to update
-LINK_PAGES = [
-    "index.html",
-    "case-reports.html"
-]
-
-# Folder containing all case report HTMLs
-CASE_FOLDER = Path("casereports")
+SITE_ROOT = Path(".")
+CASE_REPORTS_PAGES = ["index.html", "case-reports.html"]
+CASE_REPORTS_FOLDER = SITE_ROOT / "casereports"
+LOG_FILE = SITE_ROOT / "link_replacements.log"
 
 # ----------------------------
-# Build old->new mapping
+# Build mapping from old file -> new file
 # ----------------------------
-def build_old_to_new_mapping(folder: Path):
+def build_old_to_new_map():
     mapping = {}
-    for file in folder.glob("*.html"):
-        soup = BeautifulSoup(file.read_text(encoding="utf-8"), "lxml")
-        # Look for comment indicating original file
+    for html_file in CASE_REPORTS_FOLDER.glob("*.html"):
+        soup = BeautifulSoup(html_file.read_text(encoding="utf-8"), "lxml")
+
+        # look for the comment indicating original file
         comment = soup.find(string=lambda text: isinstance(text, type(soup.Comment)) and "Original file:" in text)
         if comment:
-            old_file = comment.replace("Original file:", "").strip()
-            mapping[old_file] = file.name
+            m = re.search(r"Original file:\s*(\S+\.html)", comment)
+            if m:
+                old_file = m.group(1).strip()
+                mapping[old_file] = html_file.name
+
     return mapping
 
 # ----------------------------
-# Update links in given page
+# Replace old links in a page
 # ----------------------------
-def update_links_in_page(page_path: Path, mapping: dict):
-    content = page_path.read_text(encoding="utf-8")
-    soup = BeautifulSoup(content, "lxml")
-    links_updated = 0
+def replace_links_in_page(page_path, old_to_new):
+    page_modified = False
+    replacements = []
 
-    for a_tag in soup.find_all("a", href=True):
-        href = a_tag["href"]
-        if href in mapping:
-            a_tag["href"] = mapping[href]
-            links_updated += 1
+    soup = BeautifulSoup(page_path.read_text(encoding="utf-8"), "lxml")
 
-    if links_updated > 0:
+    for a in soup.find_all("a", href=True):
+        href = a["href"]
+        if href in old_to_new:
+            new_href = old_to_new[href]
+            replacements.append((href, new_href))
+            a["href"] = new_href
+            page_modified = True
+
+    if page_modified:
         page_path.write_text(str(soup), encoding="utf-8")
 
-    return links_updated
+    return replacements
 
 # ----------------------------
 # MAIN
 # ----------------------------
 def main():
-    print("Building old -> new mapping from casereports folder...")
-    old_to_new = build_old_to_new_mapping(CASE_FOLDER)
-    print(f"Found {len(old_to_new)} old->new mappings.")
+    old_to_new = build_old_to_new_map()
+    if not old_to_new:
+        print("No old->new mappings found.")
+        return
 
-    total_updates = 0
-    for page in LINK_PAGES:
-        page_path = Path(page)
+    log_lines = []
+
+    for page_name in CASE_REPORTS_PAGES:
+        page_path = SITE_ROOT / page_name
         if not page_path.exists():
-            print(f"Page not found, skipping: {page}")
+            print(f"Page not found: {page_path}")
             continue
-        updates = update_links_in_page(page_path, old_to_new)
-        print(f"{updates} links updated in {page}")
-        total_updates += updates
 
-    print(f"✅ Finished. Total links updated: {total_updates}")
+        replacements = replace_links_in_page(page_path, old_to_new)
+        if replacements:
+            log_lines.append(f"Updated links in {page_name}:")
+            for old_href, new_href in replacements:
+                log_lines.append(f"  {old_href} -> {new_href}")
+            log_lines.append("")  # empty line between pages
+
+    if log_lines:
+        LOG_FILE.write_text("\n".join(log_lines), encoding="utf-8")
+        print(f"✅ Link replacements logged in {LOG_FILE}")
+    else:
+        print("No links replaced.")
 
 if __name__ == "__main__":
     main()
