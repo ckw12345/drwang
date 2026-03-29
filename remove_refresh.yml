@@ -1,0 +1,26 @@
+name: Remove Refresh Meta
+
+on:
+  workflow_dispatch:       # can run manually
+  push:
+    paths:
+      - 'casereports/acupuncture-for*.html'  # only triggers if these files change
+
+jobs:
+  remove_refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: pip install beautifulsoup4
+
+      - name: Run Python script to remove refresh tags
+        run: python remove_refresh.py
