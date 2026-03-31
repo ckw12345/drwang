@@ -1,10 +1,10 @@
 name: Remove Refresh Meta
 
 on:
-  workflow_dispatch:       # can run manually
+  workflow_dispatch:
   push:
     paths:
-      - 'casereports/acupuncture-for*.html'  # only triggers if these files change
+      - 'casereports/acupuncture-for*.html'
 
 jobs:
   remove_refresh:
@@ -22,5 +22,13 @@ jobs:
       - name: Install dependencies
         run: pip install beautifulsoup4
 
-      - name: Run Python script to remove refresh tags
+      - name: Run Python script
         run: python remove_refresh.py
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add .
+          git commit -m "Removed meta refresh tags" || echo "No changes to commit"
+          git push
